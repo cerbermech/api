@@ -40,33 +40,51 @@ const ProtocolSelection = ({ onSelectProtocol }) => {
  */
 const styles = {
   container: {
-    textAlign: 'center',
-    padding: '20px',
-    fontFamily: 'Arial, sans-serif',
-  },
-  title: {
-    fontSize: '24px',
-    marginBottom: '20px',
-    color: '#333',
-  },
-  buttonsContainer: {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: '10px',
+    padding: '40px',
+    fontFamily: 'Arial, sans-serif',
+    backgroundColor: '#f4f7fa',
+    minHeight: '100vh',
+    boxSizing: 'border-box',
+  },
+  title: {
+    fontSize: '28px',
+    marginBottom: '30px',
+    color: '#333',
+    textAlign: 'center',
+  },
+  buttonsContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)', // 2 колонки
+    gap: '20px',
+    justifyItems: 'center',
   },
   button: {
-    padding: '10px 20px',
-    fontSize: '16px',
+    padding: '20px 40px',
+    fontSize: '18px',
     backgroundColor: '#007bff',
     color: '#fff',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '8px',
     cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
+    transition: 'background-color 0.3s ease, transform 0.3s ease',
+    width: '100%',
+    maxWidth: '250px',
   },
-  buttonHover: {
-    backgroundColor: '#0056b3',
+  '@media (max-width: 768px)': {
+    title: {
+      fontSize: '22px',
+    },
+    button: {
+      padding: '15px 30px',
+      fontSize: '16px',
+    },
+    buttonsContainer: {
+      gridTemplateColumns: '1fr', // 1 колонка на маленьких экранах
+    },
   },
 };
 
