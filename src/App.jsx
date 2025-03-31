@@ -2,15 +2,13 @@ import React, { useState } from 'react';
 import ProtocolSelection from './components/ProtocolSelection';
 import ProtocolForm from './components/ProtocolForm';
 import './index.css';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 
 /**
  * Главный компонент приложения.
  */
 function App() {
-  /**
-   * Состояние для хранения выбранного протокола.
-   * Если значение равно null, отображается страница выбора протокола.
-   */
+  const navigate = useNavigate(); // Хук для навигации
   const [selectedProtocol, setSelectedProtocol] = useState(null);
 
   /**
@@ -20,15 +18,22 @@ function App() {
   const handleSelectProtocol = (protocolId) => {
     console.log(`Выбран протокол с ID: ${protocolId}`);
     setSelectedProtocol(protocolId);
+    // Переход на страницу формы протокола
+    navigate('/protocol-form');
   };
 
   return (
     <div style={styles.container}>
-      {!selectedProtocol ? (
-        <ProtocolSelection onSelectProtocol={handleSelectProtocol} />
-      ) : (
-        <ProtocolForm />
-      )}
+      <Routes>
+        <Route
+          path="/"
+          element={<ProtocolSelection onSelectProtocol={handleSelectProtocol} />}
+        />
+        <Route
+          path="/protocol-form"
+          element={<ProtocolForm />}
+        />
+      </Routes>
     </div>
   );
 }

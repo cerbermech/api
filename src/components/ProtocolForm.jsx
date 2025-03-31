@@ -1,36 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { fetchClientByPhone, upsertClient } from '../api/YclientsService';
-import PrintData from './PrintData'; // Путь к компоненту печати
+import PrintData from './PrintData';
+import { useNavigate } from 'react-router-dom';
+import ProtocolSelection from './ProtocolSelection';
+
+const initialFormState = {
+  fullName: '',
+  phone: '',
+  cardNumber: '',
+  birthDate: '',
+  doctor: '',
+  service: '',
+  labData: '',
+  mriData: '',
+  diagnosis: '',
+  treatmentPlan: '',
+  physiotherapy: '',
+  impactArea: '',
+  procedurePerformed: '',
+  procedureNumber: '',
+  procedureDate: '',
+  procedureDuration: '',
+  procedureDoctor: '',
+};
 
 function ProtocolForm() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    cardNumber: '',
-    birthDate: '',
-    doctor: '',
-    service: '',
-    labData: '',
-    mriData: '',
-    diagnosis: '',
-    treatmentPlan: '',
-    physiotherapy: '',
-    impactArea: '',
-    procedurePerformed: '',
-    procedureNumber: '',
-    procedureDate: '',
-    procedureDuration: '',
-    procedureDoctor: '',
-  });
-
+  const [formData, setFormData] = useState(initialFormState);
   const [existingClient, setExistingClient] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPrint, setShowPrint] = useState(false); // состояние для отображения печатной версии
+  const [showPrint, setShowPrint] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const navigate = useNavigate(); // Хук для навигации
+
 
   const printDocument = () => {
     window.print();
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,20 +52,24 @@ function ProtocolForm() {
       if (formData.phone.length >= 10) {
         setLoading(true);
         setError('');
-        const client = await fetchClientByPhone(formData.phone);
-        if (client) {
-          setExistingClient(client);
-          setFormData((prevData) => ({
-            ...prevData,
-            fullName: client.name || '',
-          }));
-        } else {
-          setExistingClient(null);
+        try {
+          const client = await fetchClientByPhone(formData.phone);
+          if (client) {
+            setExistingClient(client);
+            setFormData((prevData) => ({
+              ...prevData,
+              fullName: client.name || '',
+            }));
+          } else {
+            setExistingClient(null);
+          }
+        } catch (err) {
+          setError('Ошибка при загрузке данных клиента');
         }
         setLoading(false);
       }
     };
-
+  
     checkClientExistence();
   }, [formData.phone]);
 
@@ -100,6 +111,14 @@ function ProtocolForm() {
       alert(`Ошибка: ${error.message || 'Не удалось сохранить данные.'}`);
     }
   };
+
+  const handleCancel = () => {
+    setFormData(initialFormState); // сбросим данные формы
+    console.log('Form data reset:', formData);
+
+    // Навигация через useEffect
+    navigate('/'); // Переход на главную страницу
+};
 
   return (
     <div>
@@ -233,14 +252,32 @@ function ProtocolForm() {
       </form>
 
       <div>
-        <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', borderRadius: '5px', border: 'none', fontSize: '16px', marginTop: '20px' }}>
+        <button type="submit" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', borderRadius: '5px', border: 'none', fontSize: '16px', marginTop: '20px' }}>
           Сохранить
         </button>
         {showPrint && <PrintData data={formData} />}
         <button onClick={printDocument} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px', border: 'none', fontSize: '16px', marginTop: '20px' }}>
           Печать
         </button>
+        <button onClick={() => setShowConfirm(true)} style={{ padding: "10px 20px", backgroundColor: "#dc3545", color: "white", borderRadius: "5px", border: "none", fontSize: "16px", marginTop: "20px", marginLeft: "10px" }}>
+          Отменить выбор
+        </button>
       </div>
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded shadow-lg">
+            <p>Вы уверены, что хотите отменить выбор?</p>
+            <div className="flex justify-between mt-4">
+              <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={handleCancel}>
+                Да
+              </button>
+              <button className="px-4 py-2 bg-gray-300 rounded" onClick={() => setShowConfirm(false)}>
+                Нет
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
